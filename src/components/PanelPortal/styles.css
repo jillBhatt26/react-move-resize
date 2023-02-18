@@ -1,0 +1,27 @@
+.panel {
+    box-sizing: border-box;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 200px;
+    height: 200px;
+    border: solid 1px black;
+}
+
+.panel_header {
+    padding: 4px;
+    background-color: #e2e0e0;
+}
+
+.panel_header:hover {
+    cursor: move;
+}
+
+.panel_content {
+    padding: 4px;
+}
+
+.panel_container {
+    position: relative;
+    height: 100%;
+}
