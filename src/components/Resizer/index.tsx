@@ -28,6 +28,10 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
         [isMouseDown, direction, handleResize]
     );
 
+    const handleMouseUpCB = useCallback(() => {
+        setIsMouseDown(false);
+    }, []);
+
     // component effects
     useEffect(() => {
         window.addEventListener('mousemove', handleMouseMoveCB);
@@ -37,15 +41,18 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
         };
     }, [handleMouseMoveCB]);
 
+    useEffect(() => {
+        window.addEventListener('mouseup', handleMouseUpCB);
+
+        return () => {
+            window.removeEventListener('mouseup', handleMouseUpCB);
+        };
+    }, [handleMouseUpCB]);
+
     // event handlers
     const handleMouseDown = (requestedDirection: Direction) => {
         setDirection(requestedDirection);
         setIsMouseDown(true);
-    };
-
-    const handleMouseUp = () => {
-        setDirection(null);
-        setIsMouseDown(false);
     };
 
     return (
@@ -53,44 +60,41 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
             <div
                 className="top-left"
                 onMouseDown={() => handleMouseDown(Direction.TOP_LEFT)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
 
             <div
                 className="top"
                 onMouseDown={() => handleMouseDown(Direction.TOP)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
 
             <div
                 className="top-right"
                 onMouseDown={() => handleMouseDown(Direction.TOP_RIGHT)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
+
             <div
                 className="right"
                 onMouseDown={() => handleMouseDown(Direction.RIGHT)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
+
             <div
                 className="right-bottom"
                 onMouseDown={() => handleMouseDown(Direction.RIGHT_BOTTOM)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
+
             <div
                 className="bottom"
                 onMouseDown={() => handleMouseDown(Direction.BOTTOM)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
+
             <div
                 className="bottom-left"
                 onMouseDown={() => handleMouseDown(Direction.BOTTOM_LEFT)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
+
             <div
                 className="left"
                 onMouseDown={() => handleMouseDown(Direction.LEFT)}
-                onMouseUp={() => handleMouseUp()}
             ></div>
         </>
     );
