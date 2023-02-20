@@ -18,11 +18,35 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
 
                 e.preventDefault();
 
-                handleResize(
-                    direction,
-                    e.movementX / ratio,
-                    e.movementY / ratio
-                );
+                let deltaX: number = e.movementX / ratio;
+                let deltaY: number = e.movementY / ratio;
+
+                if (e.shiftKey) {
+                    switch (direction) {
+                        default:
+                            deltaX = e.movementX / ratio;
+                            deltaY = e.movementY / ratio;
+                            break;
+
+                        case Direction.TOP_LEFT:
+                            deltaY = deltaX;
+                            break;
+
+                        case Direction.TOP_RIGHT:
+                            deltaY = -deltaX;
+                            break;
+
+                        case Direction.BOTTOM_LEFT:
+                            deltaY = -deltaX;
+                            break;
+
+                        case Direction.RIGHT_BOTTOM:
+                            deltaY = deltaX;
+                            break;
+                    }
+                }
+
+                handleResize(direction, deltaX, deltaY);
             }
         },
         [isMouseDown, direction, handleResize]
