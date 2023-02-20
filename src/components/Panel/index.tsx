@@ -2,6 +2,7 @@ import { FC, useRef } from 'react';
 import { Direction } from '../../enums';
 import PanelHeader from '../PanelHeader';
 import Resizer from '../Resizer';
+import Rotate from '../Rotate';
 import { IPanelProps } from './interfaces';
 
 const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
@@ -93,6 +94,8 @@ const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
 
     return (
         <div className="panel" ref={panelRef}>
+            <Rotate panelRef={panelRef} />
+
             <div className="panel_container">
                 <Resizer handleResize={handleResize} />
 
