@@ -15,10 +15,8 @@ const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
 
         if (!panel) return;
 
-        const { x, y }: DOMRect = panel.getBoundingClientRect();
-
-        panel.style.left = `${x + movementX}px`;
-        panel.style.top = `${y + movementY}px`;
+        panel.style.left = `${panel.offsetLeft + movementX}px`;
+        panel.style.top = `${panel.offsetTop + movementY}px`;
     };
 
     const handleResize = (

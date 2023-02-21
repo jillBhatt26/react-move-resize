@@ -28,8 +28,6 @@ const Rotate: FC<IRotateProps> = ({ panelRef }): JSX.Element => {
 
                 const degrees: number = radians * (180 / Math.PI) + 90;
 
-                console.log('degrees: ', degrees);
-
                 panelRef.current.style.transform = `rotate(${degrees}deg)`;
             }
         },
@@ -40,22 +38,16 @@ const Rotate: FC<IRotateProps> = ({ panelRef }): JSX.Element => {
         setShouldRotate(false);
     }, []);
 
-    const handleMouseCB = useCallback(() => {
+    // component effects
+    useEffect(() => {
         if (shouldRotate) {
             window.addEventListener('mousemove', handleMouseMoveCB);
         } else {
             window.removeEventListener('mousemove', handleMouseMoveCB);
         }
 
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMoveCB);
-        };
+        return () => window.removeEventListener('mousemove', handleMouseMoveCB);
     }, [shouldRotate, handleMouseMoveCB]);
-
-    // component effects
-    useEffect(() => {
-        handleMouseCB();
-    }, [handleMouseCB]);
 
     useEffect(() => {
         window.addEventListener('mouseup', handleMouseUpCB);

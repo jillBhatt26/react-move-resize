@@ -1,39 +1,42 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { IPanelHeaderProps } from './interfaces';
 
 const PanelHeader: FC<IPanelHeaderProps> = ({ handlePanelDrag }) => {
     // component states
     const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
-    // component callbacks
-    const handleMouseMoveCB = useCallback(
-        (e: globalThis.MouseEvent) => {
-            if (isMouseDown) {
+    // component effects
+    useEffect(() => {
+        if (isMouseDown) {
+            const handleMouseMove = (e: globalThis.MouseEvent) => {
                 const ratio = window.devicePixelRatio;
 
                 e.preventDefault();
 
-                handlePanelDrag(e.movementX / ratio, e.movementY / ratio);
-            }
-        },
-        [isMouseDown, handlePanelDrag]
-    );
+                const deltaX: number = e.movementX / ratio;
+                const deltaY: number = e.movementY / ratio;
 
-    // component effects
+                handlePanelDrag(deltaX, deltaY);
+            };
+
+            window.addEventListener('mousemove', handleMouseMove);
+
+            return () => {
+                window.removeEventListener('mousemove', handleMouseMove);
+            };
+        }
+    }, [isMouseDown, handlePanelDrag]);
+
     useEffect(() => {
-        window.addEventListener('mousemove', handleMouseMoveCB);
+        const handleMouseUp = () => setIsMouseDown(false);
 
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMoveCB);
-        };
-    }, [handleMouseMoveCB]);
+        window.addEventListener('mouseup', handleMouseUp);
+
+        return () => window.removeEventListener('mousemove', handleMouseUp);
+    }, []);
 
     return (
-        <div
-            className="panel_header"
-            onMouseUp={() => setIsMouseDown(false)}
-            onMouseDown={() => setIsMouseDown(true)}
-        >
+        <div className="panel_header" onMouseDown={() => setIsMouseDown(true)}>
             PanelHeader
         </div>
     );
