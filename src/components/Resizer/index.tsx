@@ -1,11 +1,12 @@
 import { FC, useEffect, useState, useCallback } from 'react';
 import { Direction } from '../../enums';
+import { getPanelRotation } from '../../utils';
 import { IResizerProps } from './interfaces';
 import './styles.css';
 
 const Resizer: FC<IResizerProps> = ({
     handleResize,
-    getPanelRotationDegreesCB
+    panelRef
 }): JSX.Element => {
     // component states
     const [direction, setDirection] = useState<Direction | null>(null);
@@ -19,11 +20,11 @@ const Resizer: FC<IResizerProps> = ({
 
                 const ratio = window.devicePixelRatio;
 
-                getPanelRotationDegreesCB();
-
                 e.preventDefault();
 
-                // console.log('panelRotationDegrees: ', panelRotationDegrees);
+                const degrees: number = getPanelRotation(panelRef);
+
+                console.log('degrees: ', degrees);
 
                 let deltaX: number = e.movementX / ratio;
                 let deltaY: number = e.movementY / ratio;
@@ -56,7 +57,7 @@ const Resizer: FC<IResizerProps> = ({
                 handleResize(direction, deltaX, deltaY);
             }
         },
-        [isMouseDown, direction, handleResize, getPanelRotationDegreesCB]
+        [isMouseDown, direction, handleResize, panelRef]
     );
 
     const handleMouseUpCB = useCallback(() => {

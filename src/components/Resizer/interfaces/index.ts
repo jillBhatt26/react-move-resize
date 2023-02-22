@@ -1,4 +1,5 @@
 import { Direction } from '../../../enums';
+import { MutableRefObject } from 'react';
 
 export interface IResizerProps {
     handleResize: (
@@ -6,5 +7,5 @@ export interface IResizerProps {
         movementX: number,
         movementY: number
     ) => void;
-    getPanelRotationDegreesCB: () => number | null;
+    panelRef: MutableRefObject<HTMLDivElement | null>;
 }
