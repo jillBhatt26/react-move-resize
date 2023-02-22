@@ -3,7 +3,10 @@ import { Direction } from '../../enums';
 import { IResizerProps } from './interfaces';
 import './styles.css';
 
-const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
+const Resizer: FC<IResizerProps> = ({
+    handleResize,
+    getPanelRotationDegreesCB
+}): JSX.Element => {
     // component states
     const [direction, setDirection] = useState<Direction | null>(null);
     const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
@@ -16,7 +19,11 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
 
                 const ratio = window.devicePixelRatio;
 
+                getPanelRotationDegreesCB();
+
                 e.preventDefault();
+
+                // console.log('panelRotationDegrees: ', panelRotationDegrees);
 
                 let deltaX: number = e.movementX / ratio;
                 let deltaY: number = e.movementY / ratio;
@@ -49,7 +56,7 @@ const Resizer: FC<IResizerProps> = ({ handleResize }): JSX.Element => {
                 handleResize(direction, deltaX, deltaY);
             }
         },
-        [isMouseDown, direction, handleResize]
+        [isMouseDown, direction, handleResize, getPanelRotationDegreesCB]
     );
 
     const handleMouseUpCB = useCallback(() => {

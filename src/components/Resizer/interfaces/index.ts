@@ -6,4 +6,5 @@ export interface IResizerProps {
         movementX: number,
         movementY: number
     ) => void;
+    getPanelRotationDegreesCB: () => number | null;
 }

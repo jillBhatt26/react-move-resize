@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useRef, useCallback } from 'react';
 import { Direction } from '../../enums';
 import PanelHeader from '../PanelHeader';
 import Resizer from '../Resizer';
@@ -8,6 +8,51 @@ import { IPanelProps } from './interfaces';
 const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
     // component refs
     const panelRef = useRef<HTMLDivElement | null>(null);
+
+    // component callbacks
+    const getPanelRotationDegreesCB: () => number | null = useCallback(() => {
+        let rotationAngleDegrees: number | null = null;
+
+        if (panelRef && panelRef.current) {
+            const panel = panelRef.current;
+
+            const panelComputedStyle: CSSStyleDeclaration =
+                window.getComputedStyle(panel);
+
+            const cssTransformValue: string =
+                panelComputedStyle.getPropertyValue('-webkit-transform') ||
+                panelComputedStyle.getPropertyValue('-moz-transform') ||
+                panelComputedStyle.getPropertyValue('-ms-transform') ||
+                panelComputedStyle.getPropertyValue('-o-transform') ||
+                panelComputedStyle.getPropertyValue('transform');
+
+            console.log(
+                'cssTransformValue: ',
+                panelComputedStyle.getPropertyValue('transform')
+            );
+
+            if (cssTransformValue !== 'none') {
+                const values = cssTransformValue
+                    .split('(')[1]
+                    .split(')')[0]
+                    .split(',');
+
+                rotationAngleDegrees = Math.round(
+                    Math.atan2(parseInt(values[1]), parseInt(values[0])) *
+                        (180 / Math.PI)
+                );
+
+                rotationAngleDegrees =
+                    rotationAngleDegrees < 0
+                        ? rotationAngleDegrees + 360
+                        : rotationAngleDegrees;
+
+                console.log('rotationAngleDegrees: ', rotationAngleDegrees);
+            }
+        }
+
+        return rotationAngleDegrees;
+    }, [panelRef]);
 
     // event handlers
     const handlePanelDrag = (movementX: number, movementY: number) => {
@@ -95,7 +140,10 @@ const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
             <Rotate panelRef={panelRef} />
 
             <div className="panel_container">
-                <Resizer handleResize={handleResize} />
+                <Resizer
+                    handleResize={handleResize}
+                    getPanelRotationDegreesCB={getPanelRotationDegreesCB}
+                />
 
                 <PanelHeader handlePanelDrag={handlePanelDrag} />
 
