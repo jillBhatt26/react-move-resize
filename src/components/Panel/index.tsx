@@ -96,10 +96,7 @@ const Panel: FC<IPanelProps> = ({ children }): JSX.Element => {
             <Rotate panelRef={panelRef} />
 
             <div className="panel_container">
-                <Resizer
-                    handleResize={handleResize}
-                    panelRef={panelRef}
-                />
+                <Resizer handleResize={handleResize} panelRef={panelRef} />
 
                 <PanelHeader handlePanelDrag={handlePanelDrag} />
 

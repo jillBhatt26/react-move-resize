@@ -1,8 +1,11 @@
-import { FC, useEffect, useState, useCallback } from 'react';
+import { FC, useEffect, useState, useCallback, MouseEvent } from 'react';
 import { Direction } from '../../enums';
-import { getPanelRotation } from '../../utils';
 import { IResizerProps } from './interfaces';
+import { getPanelRotation } from '../../utils';
 import './styles.css';
+
+const minWidth = 40;
+const minHeight = 40;
 
 const Resizer: FC<IResizerProps> = ({
     handleResize,
@@ -11,53 +14,152 @@ const Resizer: FC<IResizerProps> = ({
     // component states
     const [direction, setDirection] = useState<Direction | null>(null);
     const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+    const [initPanelClickXPos, setInitPanelClickXPos] = useState<number | null>(
+        null
+    );
+    const [initPanelClickYPos, setInitPanelClickYPos] = useState<number | null>(
+        null
+    );
 
     // component callbacks
+    const panelResizeCB = useCallback(
+        (width: number, height: number) => {
+            if (!panelRef || !panelRef.current) return;
+
+            const panelDiv: HTMLDivElement = panelRef.current;
+
+            panelDiv.style.width = `${width}px`;
+            panelDiv.style.height = `${height}px`;
+        },
+        [panelRef]
+    );
+
+    const panelRepositionCB = useCallback(
+        (x: number, y: number) => {
+            if (!panelRef || !panelRef.current) return;
+
+            const panelDiv: HTMLDivElement = panelRef.current;
+
+            panelDiv.style.left = `${x}px`;
+            panelDiv.style.top = `${y}px`;
+        },
+        [panelRef]
+    );
+
     const handleMouseMoveCB = useCallback(
         (e: globalThis.MouseEvent) => {
             if (isMouseDown) {
                 if (!direction) return;
 
-                const ratio = window.devicePixelRatio;
+                if (!panelRef || !panelRef.current) return;
+
+                if (!initPanelClickXPos || !initPanelClickYPos) return;
 
                 e.preventDefault();
 
-                const degrees: number = getPanelRotation(panelRef);
+                // const ratio = window.devicePixelRatio;
 
-                console.log('degrees: ', degrees);
+                const panelDiv: HTMLDivElement = panelRef.current;
 
-                let deltaX: number = e.movementX / ratio;
-                let deltaY: number = e.movementY / ratio;
+                const {
+                    offsetLeft: initX,
+                    offsetTop: initY,
+                    offsetWidth: initW,
+                    offsetHeight: initH
+                } = panelDiv;
 
-                if (e.shiftKey) {
-                    switch (direction) {
-                        default:
-                            deltaX = e.movementX / ratio;
-                            deltaY = e.movementY / ratio;
-                            break;
+                const mousePressX: number = initPanelClickXPos;
+                const mousePressY: number = initPanelClickYPos;
 
-                        case Direction.TOP_LEFT:
-                            deltaY = deltaX;
-                            break;
+                const panelRotationDegrees: number = getPanelRotation(panelRef);
 
-                        case Direction.TOP_RIGHT:
-                            deltaY = -deltaX;
-                            break;
+                const panelRotationRadians: number =
+                    (panelRotationDegrees * Math.PI) / 180;
 
-                        case Direction.BOTTOM_LEFT:
-                            deltaY = -deltaX;
-                            break;
+                const cosFraction: number = Math.cos(panelRotationRadians);
+                const sinFraction: number = Math.sin(panelRotationRadians);
 
-                        case Direction.RIGHT_BOTTOM:
-                            deltaY = deltaX;
-                            break;
+                const wDiff = e.clientX - mousePressX;
+                const hDiff = e.clientY - mousePressY;
+
+                let rotatedWDiff = cosFraction * wDiff + sinFraction * hDiff;
+                let rotatedHDiff = cosFraction * hDiff - sinFraction * wDiff;
+
+                let newW = initW;
+                let newH = initH;
+                let newX = initX;
+                let newY = initY;
+
+                if (direction === Direction.LEFT) {
+                    newW = initW - rotatedWDiff;
+
+                    if (newW < minWidth) {
+                        newW = minWidth;
+                        rotatedWDiff = initW - minWidth;
                     }
+
+                    newX += 0.5 * rotatedWDiff * cosFraction;
+                    newY += 0.5 * rotatedWDiff * sinFraction;
+
+                    panelResizeCB(newW, newH);
+                    panelRepositionCB(newX, newY);
                 }
 
-                handleResize(direction, deltaX, deltaY);
+                if (direction === Direction.RIGHT) {
+                    newW = initW + rotatedWDiff;
+
+                    if (newW < minWidth) {
+                        newW = minWidth;
+                        rotatedWDiff = minWidth - initW;
+                    }
+
+                    newX += 0.5 * rotatedWDiff * cosFraction;
+                    newY += 0.5 * rotatedWDiff * sinFraction;
+
+                    panelResizeCB(newW, newH);
+                    panelRepositionCB(newX, newY);
+                }
+
+                if (direction === Direction.TOP) {
+                    newH = initH - rotatedHDiff;
+
+                    if (newH < minHeight) {
+                        newH = minHeight;
+                        rotatedHDiff = initH - minHeight;
+                    }
+
+                    newX -= 0.5 * rotatedHDiff * sinFraction;
+                    newY += 0.5 * rotatedHDiff * cosFraction;
+
+                    panelResizeCB(newW, newH);
+                    panelRepositionCB(newX, newY);
+                }
+
+                if (direction === Direction.BOTTOM) {
+                    newH = initH + rotatedHDiff;
+
+                    if (newH < minHeight) {
+                        newH = minHeight;
+                        rotatedHDiff = minHeight - initH;
+                    }
+
+                    newX -= 0.5 * rotatedHDiff * sinFraction;
+                    newY += 0.5 * rotatedHDiff * cosFraction;
+
+                    panelResizeCB(newW, newH);
+                    panelRepositionCB(newX, newY);
+                }
             }
         },
-        [isMouseDown, direction, handleResize, panelRef]
+        [
+            isMouseDown,
+            direction,
+            panelRef,
+            initPanelClickXPos,
+            initPanelClickYPos,
+            panelResizeCB,
+            panelRepositionCB
+        ]
     );
 
     const handleMouseUpCB = useCallback(() => {
@@ -66,11 +168,10 @@ const Resizer: FC<IResizerProps> = ({
 
     // component effects
     useEffect(() => {
-        window.addEventListener('mousemove', handleMouseMoveCB);
+        window.addEventListener('mousemove', handleMouseMoveCB, false);
 
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMoveCB);
-        };
+        return () =>
+            window.removeEventListener('mousemove', handleMouseMoveCB, false);
     }, [handleMouseMoveCB]);
 
     useEffect(() => {
@@ -82,51 +183,53 @@ const Resizer: FC<IResizerProps> = ({
     }, [handleMouseUpCB]);
 
     // event handlers
-    const handleMouseDown = (requestedDirection: Direction) => {
+    const handleMouseDown = (e: MouseEvent, requestedDirection: Direction) => {
         setDirection(requestedDirection);
         setIsMouseDown(true);
+        setInitPanelClickXPos(e.clientX);
+        setInitPanelClickYPos(e.clientY);
     };
 
     return (
         <>
             <div
                 className="top-left"
-                onMouseDown={() => handleMouseDown(Direction.TOP_LEFT)}
+                onMouseDown={e => handleMouseDown(e, Direction.TOP_LEFT)}
             ></div>
 
             <div
                 className="top"
-                onMouseDown={() => handleMouseDown(Direction.TOP)}
+                onMouseDown={e => handleMouseDown(e, Direction.TOP)}
             ></div>
 
             <div
                 className="top-right"
-                onMouseDown={() => handleMouseDown(Direction.TOP_RIGHT)}
+                onMouseDown={e => handleMouseDown(e, Direction.TOP_RIGHT)}
             ></div>
 
             <div
                 className="right"
-                onMouseDown={() => handleMouseDown(Direction.RIGHT)}
+                onMouseDown={e => handleMouseDown(e, Direction.RIGHT)}
             ></div>
 
             <div
                 className="right-bottom"
-                onMouseDown={() => handleMouseDown(Direction.RIGHT_BOTTOM)}
+                onMouseDown={e => handleMouseDown(e, Direction.RIGHT_BOTTOM)}
             ></div>
 
             <div
                 className="bottom"
-                onMouseDown={() => handleMouseDown(Direction.BOTTOM)}
+                onMouseDown={e => handleMouseDown(e, Direction.BOTTOM)}
             ></div>
 
             <div
                 className="bottom-left"
-                onMouseDown={() => handleMouseDown(Direction.BOTTOM_LEFT)}
+                onMouseDown={e => handleMouseDown(e, Direction.BOTTOM_LEFT)}
             ></div>
 
             <div
                 className="left"
-                onMouseDown={() => handleMouseDown(Direction.LEFT)}
+                onMouseDown={e => handleMouseDown(e, Direction.LEFT)}
             ></div>
         </>
     );
