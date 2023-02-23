@@ -107,6 +107,8 @@ const NewPanel = (): JSX.Element => {
     ) => {
         event.preventDefault();
 
+        if (event.button !== 0) return;
+
         setShouldPanelMove(true);
     };
 
@@ -121,6 +123,8 @@ const NewPanel = (): JSX.Element => {
             <PanelControls
                 boxWrapperDivRef={boxWrapperDivRef}
                 boxDivRef={boxDivRef}
+                handleRepositionPanelCB={handleRepositionPanelCB}
+                handleResizePanelCB={handleResizePanelCB}
             />
         </div>
     );
