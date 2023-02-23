@@ -45,17 +45,6 @@ const NewPanel = (): JSX.Element => {
         [boxDivRef]
     );
 
-    // const handleRotatePanelCB = useCallback(
-    //     (deg: number) => {
-    //         if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
-
-    //         const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
-
-    //         boxWrapperDiv.style.transform = `rotate(${deg}deg)`;
-    //     },
-    //     [boxWrapperDivRef]
-    // );
-
     const handleMouseUpCB = useCallback(
         (mouseUpEvent: globalThis.MouseEvent) => {
             mouseUpEvent.preventDefault();
@@ -129,7 +118,10 @@ const NewPanel = (): JSX.Element => {
                 onMouseDown={handleBoxWrapperMouseDown}
             />
 
-            <PanelControls />
+            <PanelControls
+                boxWrapperDivRef={boxWrapperDivRef}
+                boxDivRef={boxDivRef}
+            />
         </div>
     );
 };
