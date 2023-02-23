@@ -2,7 +2,12 @@
     background-color: #00bcd4;
     position: relative;
     user-select: none;
-    transform: translate(-50%, -50%);
+    cursor: grab;
+    /* transform: translate(-50%, -50%); */
+}
+
+.box:active {
+    cursor: grabbing;
 }
 
 .box-wrapper {

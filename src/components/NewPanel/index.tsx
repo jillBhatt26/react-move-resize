@@ -7,6 +7,7 @@ import {
     MouseEventHandler,
     MouseEvent
 } from 'react';
+import PanelControls from './components/PanelControls';
 import './styles.css';
 
 const NewPanel = (): JSX.Element => {
@@ -14,23 +15,6 @@ const NewPanel = (): JSX.Element => {
     const boxWrapperDivRef: MutableRefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement | null>(null);
     const boxDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-
-    const leftTopDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const leftBottomDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const topMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const bottomMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const leftMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightBottomDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightTopDivRef: MutableRefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement | null>(null);
 
     // component states
@@ -61,16 +45,16 @@ const NewPanel = (): JSX.Element => {
         [boxDivRef]
     );
 
-    const handleRotatePanelCB = useCallback(
-        (deg: number) => {
-            if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
+    // const handleRotatePanelCB = useCallback(
+    //     (deg: number) => {
+    //         if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
 
-            const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
+    //         const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
 
-            boxWrapperDiv.style.transform = `rotate(${deg}deg)`;
-        },
-        [boxWrapperDivRef]
-    );
+    //         boxWrapperDiv.style.transform = `rotate(${deg}deg)`;
+    //     },
+    //     [boxWrapperDivRef]
+    // );
 
     const handleMouseUpCB = useCallback(
         (mouseUpEvent: globalThis.MouseEvent) => {
@@ -138,61 +122,14 @@ const NewPanel = (): JSX.Element => {
     };
 
     return (
-        <div
-            className="box-wrapper"
-            id="box-wrapper"
-            ref={boxWrapperDivRef}
-            onMouseDown={handleBoxWrapperMouseDown}
-        >
-            <div className="box" id="box" ref={boxDivRef}>
-                <div className="dot rotate" id="rotate" />
+        <div className="box-wrapper" ref={boxWrapperDivRef}>
+            <div
+                className="box"
+                ref={boxDivRef}
+                onMouseDown={handleBoxWrapperMouseDown}
+            />
 
-                <div
-                    className="dot left-top"
-                    id="left-top"
-                    ref={leftTopDivRef}
-                />
-
-                <div
-                    className="dot left-bottom"
-                    id="left-bottom"
-                    ref={leftBottomDivRef}
-                />
-
-                <div className="dot top-mid" id="top-mid" ref={topMidDivRef} />
-
-                <div
-                    className="dot bottom-mid"
-                    id="bottom-mid"
-                    ref={bottomMidDivRef}
-                />
-
-                <div
-                    className="dot left-mid"
-                    id="left-mid"
-                    ref={leftMidDivRef}
-                />
-
-                <div
-                    className="dot right-mid"
-                    id="right-mid"
-                    ref={rightMidDivRef}
-                />
-
-                <div
-                    className="dot right-bottom"
-                    id="right-bottom"
-                    ref={rightBottomDivRef}
-                />
-
-                <div
-                    className="dot right-top"
-                    id="right-top"
-                    ref={rightTopDivRef}
-                />
-
-                <div className="rotate-link" />
-            </div>
+            <PanelControls />
         </div>
     );
 };
