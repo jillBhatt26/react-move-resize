@@ -1,7 +1,8 @@
-import PanelPortal from './components/PanelPortal';
+import NewPanel from './components/NewPanel';
+// import PanelPortal from './components/PanelPortal';
 
 const App = () => {
-    return <PanelPortal />;
+    return <NewPanel />;
 };
 
 export default App;
