@@ -1,6 +1,4 @@
 import {
-    useRef,
-    MutableRefObject,
     MouseEventHandler,
     MouseEvent,
     useState,
@@ -9,7 +7,6 @@ import {
     FC
 } from 'react';
 import { MIN_HEIGHT, MIN_WIDTH } from '../../../../constants';
-import { Direction } from '../../../../enums';
 import { getPanelRotation } from '../../../../utils';
 import { IPanelControlsProps } from './interfaces';
 
@@ -19,34 +16,8 @@ const PanelControls: FC<IPanelControlsProps> = ({
     handleRepositionPanelCB,
     handleResizePanelCB
 }): JSX.Element => {
-    // component refs
-    const rotateDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const leftTopDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const leftBottomDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const topMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const bottomMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const leftMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightMidDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightBottomDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-    const rightTopDivRef: MutableRefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement | null>(null);
-
     // component states
     const [shouldPanelRotate, setShouldPanelRotate] = useState<boolean>(false);
-    const [shouldPanelResize, setShouldPanelResize] = useState<boolean>(false);
-    const [resizeDirection, setResizeDirection] = useState<Direction | null>(
-        null
-    );
-    const [mousePressX, setMousePressX] = useState<number | null>(null);
-    const [mousePressY, setMousePressY] = useState<number | null>(null);
 
     // component callbacks
     const handleRotatePanelCB = useCallback(
@@ -65,7 +36,6 @@ const PanelControls: FC<IPanelControlsProps> = ({
             mouseUpEvent.preventDefault();
 
             setShouldPanelRotate(false);
-            setShouldPanelResize(false);
         },
         []
     );
@@ -75,20 +45,7 @@ const PanelControls: FC<IPanelControlsProps> = ({
             if (shouldPanelRotate) {
                 if (!boxDivRef || !boxDivRef.current) return;
 
-                if (!rotateDivRef || !rotateDivRef.current) return;
-
                 const boxDiv: HTMLDivElement = boxDivRef.current;
-
-                // const { left, top, width, height } = boxDiv.getBoundingClientRect();
-
-                // const boxCenterX: number = left + width / 2;
-                // const boxCenterY: number = top + height / 2;
-
-                // const { clientX, clientY } = mouseMoveEvent;
-
-                // const angle: number =
-                //     Math.atan2(clientY - boxCenterX, clientX - boxCenterY) +
-                //     Math.PI / 2;
 
                 const { width, height, top, left } =
                     boxDiv.getBoundingClientRect();
@@ -107,93 +64,8 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
                 handleRotatePanelCB(degrees);
             }
-
-            if (shouldPanelResize) {
-                if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
-
-                if (mousePressX === null || mousePressY === null) return;
-
-                const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
-
-                const {
-                    offsetTop: initY,
-                    offsetLeft: initX,
-                    offsetWidth: initW,
-                    offsetHeight: initH
-                } = boxWrapperDiv;
-
-                const boxWrapperDivRotation: number =
-                    getPanelRotation(boxWrapperDivRef);
-
-                const initRadians: number =
-                    boxWrapperDivRotation * (Math.PI / 180);
-
-                const cosFraction = Math.cos(initRadians);
-                const sinFraction = Math.sin(initRadians);
-
-                const { clientX, clientY } = mouseMoveEvent;
-
-                var wDiff = clientX - mousePressX;
-                var hDiff = clientY - mousePressY;
-
-                let rotatedWDiff = cosFraction * wDiff + sinFraction * hDiff;
-                let rotatedHDiff = cosFraction * hDiff - sinFraction * wDiff;
-
-                let newW = initW;
-                let newH = initH;
-                let newX = initX;
-                let newY = initY;
-
-                switch (resizeDirection) {
-                    case Direction.TOP:
-                        newH = initH - rotatedHDiff;
-
-                        if (newH < MIN_HEIGHT) {
-                            newH = MIN_HEIGHT;
-
-                            rotatedHDiff = initH - MIN_HEIGHT;
-                        }
-
-                        break;
-
-                    case Direction.BOTTOM:
-                        break;
-
-                    case Direction.LEFT:
-                        newW = initW - rotatedWDiff;
-
-                        if (newW < MIN_WIDTH) {
-                            newW = MIN_WIDTH;
-                            rotatedWDiff = initW - MIN_WIDTH;
-                        }
-                        break;
-
-                    case Direction.RIGHT:
-                        break;
-
-                    default:
-                        return;
-                }
-
-                newX -= 0.5 * rotatedHDiff * sinFraction;
-                newY += 0.5 * rotatedHDiff * cosFraction;
-
-                handleRepositionPanelCB(newX, newY);
-                handleResizePanelCB(newW, newH);
-            }
         },
-        [
-            shouldPanelRotate,
-            shouldPanelResize,
-            mousePressX,
-            mousePressY,
-            resizeDirection,
-            boxDivRef,
-            boxWrapperDivRef,
-            handleRotatePanelCB,
-            handleRepositionPanelCB,
-            handleResizePanelCB
-        ]
+        [shouldPanelRotate, boxDivRef, handleRotatePanelCB]
     );
 
     // component effects
@@ -222,7 +94,6 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
         if (rotateMouseEvent.button !== 0) return;
 
-        setShouldPanelResize(false);
         setShouldPanelRotate(true);
 
         rotateMouseEvent.stopPropagation();
@@ -230,18 +101,94 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
     const handleResizeMouseDown = (
         resizeMouseEvent: MouseEvent<HTMLDivElement>,
-        direction: Direction
+        left: boolean = false,
+        top: boolean = false,
+        xResize: boolean = false,
+        yResize: boolean = false
     ) => {
-        resizeMouseEvent.preventDefault();
+        if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
+        if (!boxDivRef || !boxDivRef.current) return;
 
-        if (resizeMouseEvent.button !== 0) return;
+        const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
+        const boxDiv: HTMLDivElement = boxDivRef.current;
 
-        setShouldPanelRotate(false);
-        setShouldPanelResize(true);
-        setResizeDirection(direction);
+        const initX = boxWrapperDiv.offsetLeft;
+        const initY = boxWrapperDiv.offsetTop;
+        const mousePressX = resizeMouseEvent.clientX;
+        const mousePressY = resizeMouseEvent.clientY;
 
-        setMousePressX(resizeMouseEvent.clientX);
-        setMousePressY(resizeMouseEvent.clientY);
+        const initW = boxDiv.offsetWidth;
+        const initH = boxDiv.offsetHeight;
+
+        const initRotate = getPanelRotation(boxWrapperDivRef);
+        const initRadians = (initRotate * Math.PI) / 180;
+        const cosFraction = Math.cos(initRadians);
+        const sinFraction = Math.sin(initRadians);
+
+        function eventMoveHandler(event: globalThis.MouseEvent) {
+            const wDiff = event.clientX - mousePressX;
+            const hDiff = event.clientY - mousePressY;
+            let rotatedWDiff = cosFraction * wDiff + sinFraction * hDiff;
+            let rotatedHDiff = cosFraction * hDiff - sinFraction * wDiff;
+
+            let newW = initW;
+            let newH = initH;
+            let newX = initX;
+            let newY = initY;
+
+            if (xResize) {
+                if (left) {
+                    newW = initW - rotatedWDiff;
+
+                    if (newW < MIN_WIDTH) {
+                        newW = MIN_WIDTH;
+                        rotatedWDiff = initW - MIN_WIDTH;
+                    }
+                } else {
+                    newW = initW + rotatedWDiff;
+
+                    if (newW < MIN_WIDTH) {
+                        newW = MIN_WIDTH;
+                        rotatedWDiff = MIN_WIDTH - initW;
+                    }
+                }
+
+                newX += 0.5 * rotatedWDiff * cosFraction;
+                newY += 0.5 * rotatedWDiff * sinFraction;
+            }
+
+            if (yResize) {
+                if (top) {
+                    newH = initH - rotatedHDiff;
+
+                    if (newH < MIN_HEIGHT) {
+                        newH = MIN_HEIGHT;
+                        rotatedHDiff = initH - MIN_HEIGHT;
+                    }
+                } else {
+                    newH = initH + rotatedHDiff;
+
+                    if (newH < MIN_HEIGHT) {
+                        newH = MIN_HEIGHT;
+                        rotatedHDiff = MIN_HEIGHT - initH;
+                    }
+                }
+
+                newX -= 0.5 * rotatedHDiff * sinFraction;
+                newY += 0.5 * rotatedHDiff * cosFraction;
+            }
+
+            handleResizePanelCB(newW, newH);
+            handleRepositionPanelCB(newX, newY);
+        }
+
+        window.addEventListener('mousemove', eventMoveHandler);
+        window.addEventListener('mouseup', function eventEndHandler() {
+            window.removeEventListener('mousemove', eventMoveHandler);
+            window.removeEventListener('mouseup', eventEndHandler);
+        });
+
+        resizeMouseEvent.stopPropagation();
     };
 
     return (
@@ -249,68 +196,71 @@ const PanelControls: FC<IPanelControlsProps> = ({
             <div
                 className="dot rotate"
                 id="rotate"
-                ref={rotateDivRef}
                 onMouseDown={handleRotateMouseDown}
             />
 
             <div
                 className="dot left-top"
                 id="left-top"
-                ref={leftTopDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.TOP_LEFT)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, true, true, true, true)
+                }
             />
 
             <div
                 className="dot left-bottom"
                 id="left-bottom"
-                ref={leftBottomDivRef}
                 onMouseDown={e =>
-                    handleResizeMouseDown(e, Direction.BOTTOM_LEFT)
+                    handleResizeMouseDown(e, true, false, true, true)
                 }
             />
 
             <div
                 className="dot top-mid"
                 id="top-mid"
-                ref={topMidDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.TOP)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, false, true, false, true)
+                }
             />
 
             <div
                 className="dot bottom-mid"
                 id="bottom-mid"
-                ref={bottomMidDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.BOTTOM)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, false, false, false, true)
+                }
             />
 
             <div
                 className="dot left-mid"
                 id="left-mid"
-                ref={leftMidDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.LEFT)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, true, false, true, false)
+                }
             />
 
             <div
                 className="dot right-mid"
                 id="right-mid"
-                ref={rightMidDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.RIGHT)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, false, false, true, false)
+                }
             />
 
             <div
                 className="dot right-bottom"
                 id="right-bottom"
-                ref={rightBottomDivRef}
                 onMouseDown={e =>
-                    handleResizeMouseDown(e, Direction.RIGHT_BOTTOM)
+                    handleResizeMouseDown(e, false, false, true, true)
                 }
             />
 
             <div
                 className="dot right-top"
                 id="right-top"
-                ref={rightTopDivRef}
-                onMouseDown={e => handleResizeMouseDown(e, Direction.TOP_RIGHT)}
+                onMouseDown={e =>
+                    handleResizeMouseDown(e, false, true, true, true)
+                }
             />
 
             <div className="rotate-link" />
