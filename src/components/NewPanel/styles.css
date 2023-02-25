@@ -3,7 +3,7 @@
     position: relative;
     user-select: none;
     cursor: grab;
-    /* transform: translate(-50%, -50%); */
+    transform: translate(-50%, -50%);
 }
 
 .box:active {
@@ -12,7 +12,7 @@
 
 .box-wrapper {
     position: absolute;
-    transform-origin: center center;
+    transform-origin: top left;
     user-select: none;
 }
 

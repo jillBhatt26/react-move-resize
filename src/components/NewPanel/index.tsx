@@ -118,14 +118,14 @@ const NewPanel = (): JSX.Element => {
                 className="box"
                 ref={boxDivRef}
                 onMouseDown={handleBoxWrapperMouseDown}
-            />
-
-            <PanelControls
-                boxWrapperDivRef={boxWrapperDivRef}
-                boxDivRef={boxDivRef}
-                handleRepositionPanelCB={handleRepositionPanelCB}
-                handleResizePanelCB={handleResizePanelCB}
-            />
+            >
+                <PanelControls
+                    boxWrapperDivRef={boxWrapperDivRef}
+                    boxDivRef={boxDivRef}
+                    handleRepositionPanelCB={handleRepositionPanelCB}
+                    handleResizePanelCB={handleResizePanelCB}
+                />
+            </div>
         </div>
     );
 };
