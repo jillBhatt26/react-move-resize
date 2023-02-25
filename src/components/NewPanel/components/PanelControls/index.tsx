@@ -9,6 +9,8 @@ import {
 import { MIN_HEIGHT, MIN_WIDTH } from '../../../../constants';
 import { getPanelRotation } from '../../../../utils';
 import { IPanelControlsProps } from './interfaces';
+import RotateIcon from '../../../../assets/rotate.svg';
+import { Direction } from '../../../../enums';
 
 const PanelControls: FC<IPanelControlsProps> = ({
     boxWrapperDivRef,
@@ -18,6 +20,11 @@ const PanelControls: FC<IPanelControlsProps> = ({
 }): JSX.Element => {
     // component states
     const [shouldPanelRotate, setShouldPanelRotate] = useState<boolean>(false);
+    const [shouldHideResizeDots, setShouldHideResizeDots] =
+        useState<boolean>(false);
+    const [resizeDirection, setResizeDirection] = useState<Direction | null>(
+        null
+    );
 
     // component callbacks
     const handleRotatePanelCB = useCallback(
@@ -69,6 +76,9 @@ const PanelControls: FC<IPanelControlsProps> = ({
     );
 
     // component effects
+    useEffect(() => {
+        setShouldHideResizeDots(shouldPanelRotate);
+    }, [shouldPanelRotate]);
 
     // mouse up handler effect
     useEffect(() => {
@@ -104,13 +114,16 @@ const PanelControls: FC<IPanelControlsProps> = ({
         left: boolean = false,
         top: boolean = false,
         xResize: boolean = false,
-        yResize: boolean = false
+        yResize: boolean = false,
+        direction: Direction
     ) => {
         if (!boxWrapperDivRef || !boxWrapperDivRef.current) return;
         if (!boxDivRef || !boxDivRef.current) return;
 
         const boxWrapperDiv: HTMLDivElement = boxWrapperDivRef.current;
         const boxDiv: HTMLDivElement = boxDivRef.current;
+
+        setResizeDirection(direction);
 
         const initX = boxWrapperDiv.offsetLeft;
         const initY = boxWrapperDiv.offsetTop;
@@ -184,6 +197,8 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
         window.addEventListener('mousemove', eventMoveHandler);
         window.addEventListener('mouseup', function eventEndHandler() {
+            setResizeDirection(null);
+
             window.removeEventListener('mousemove', eventMoveHandler);
             window.removeEventListener('mouseup', eventEndHandler);
         });
@@ -193,77 +208,148 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
     return (
         <>
-            <div
-                className="dot rotate"
-                id="rotate"
-                onMouseDown={handleRotateMouseDown}
-            />
+            {!resizeDirection && (
+                <div className="" onMouseDown={handleRotateMouseDown}>
+                    <img
+                        src={RotateIcon}
+                        alt="Rotate icon svg"
+                        style={{
+                            maxWidth: '100%',
+                            width: '20px',
+                            margin: '-40px auto 0',
+                            position: 'absolute',
+                            left: 0,
+                            right: 0
+                        }}
+                    />
+                </div>
+            )}
 
-            <div
-                className="dot left-top"
-                id="left-top"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, true, true, true, true)
-                }
-            />
+            {!shouldHideResizeDots && (
+                <>
+                    <div
+                        className="dot left-top"
+                        id="left-top"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                true,
+                                true,
+                                true,
+                                true,
+                                Direction.TOP_LEFT
+                            )
+                        }
+                    />
 
-            <div
-                className="dot left-bottom"
-                id="left-bottom"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, true, false, true, true)
-                }
-            />
+                    <div
+                        className="dot left-bottom"
+                        id="left-bottom"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                true,
+                                false,
+                                true,
+                                true,
+                                Direction.BOTTOM_LEFT
+                            )
+                        }
+                    />
 
-            <div
-                className="dot top-mid"
-                id="top-mid"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, false, true, false, true)
-                }
-            />
+                    <div
+                        className="dot top-mid"
+                        id="top-mid"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                false,
+                                true,
+                                false,
+                                true,
+                                Direction.TOP
+                            )
+                        }
+                    />
 
-            <div
-                className="dot bottom-mid"
-                id="bottom-mid"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, false, false, false, true)
-                }
-            />
+                    <div
+                        className="dot bottom-mid"
+                        id="bottom-mid"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                false,
+                                false,
+                                false,
+                                true,
+                                Direction.BOTTOM
+                            )
+                        }
+                    />
 
-            <div
-                className="dot left-mid"
-                id="left-mid"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, true, false, true, false)
-                }
-            />
+                    <div
+                        className="dot left-mid"
+                        id="left-mid"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                true,
+                                false,
+                                true,
+                                false,
+                                Direction.LEFT
+                            )
+                        }
+                    />
 
-            <div
-                className="dot right-mid"
-                id="right-mid"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, false, false, true, false)
-                }
-            />
+                    <div
+                        className="dot right-mid"
+                        id="right-mid"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                false,
+                                false,
+                                true,
+                                false,
+                                Direction.RIGHT
+                            )
+                        }
+                    />
 
-            <div
-                className="dot right-bottom"
-                id="right-bottom"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, false, false, true, true)
-                }
-            />
+                    <div
+                        className="dot right-bottom"
+                        id="right-bottom"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                false,
+                                false,
+                                true,
+                                true,
+                                Direction.RIGHT_BOTTOM
+                            )
+                        }
+                    />
 
-            <div
-                className="dot right-top"
-                id="right-top"
-                onMouseDown={e =>
-                    handleResizeMouseDown(e, false, true, true, true)
-                }
-            />
+                    <div
+                        className="dot right-top"
+                        id="right-top"
+                        onMouseDown={e =>
+                            handleResizeMouseDown(
+                                e,
+                                false,
+                                true,
+                                true,
+                                true,
+                                Direction.TOP_RIGHT
+                            )
+                        }
+                    />
+                </>
+            )}
 
-            <div className="rotate-link" />
+            {/* <div className="rotate-link" /> */}
         </>
     );
 };
