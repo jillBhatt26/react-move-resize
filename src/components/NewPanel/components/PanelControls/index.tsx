@@ -224,6 +224,8 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
         setShouldPanelResize(false);
         setShouldPanelRotate(true);
+
+        rotateMouseEvent.stopPropagation();
     };
 
     const handleResizeMouseDown = (
