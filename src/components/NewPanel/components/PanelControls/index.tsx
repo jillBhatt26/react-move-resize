@@ -49,28 +49,27 @@ const PanelControls: FC<IPanelControlsProps> = ({
 
     const handleMouseMoveCB = useCallback(
         (mouseMoveEvent: globalThis.MouseEvent) => {
-            if (shouldPanelRotate) {
-                if (!boxDivRef || !boxDivRef.current) return;
+            if (!shouldPanelRotate) return;
 
-                const boxDiv: HTMLDivElement = boxDivRef.current;
+            if (!boxDivRef || !boxDivRef.current) return;
 
-                const { width, height, top, left } =
-                    boxDiv.getBoundingClientRect();
+            const boxDiv: HTMLDivElement = boxDivRef.current;
 
-                const centerX: number = left + width / 2;
-                const centerY: number = top + height / 2;
+            const { width, height, top, left } = boxDiv.getBoundingClientRect();
 
-                const { pageX: mouseX, pageY: mouseY } = mouseMoveEvent;
+            const centerX: number = left + width / 2;
+            const centerY: number = top + height / 2;
 
-                const radians: number = Math.atan2(
-                    mouseY - centerY,
-                    mouseX - centerX
-                );
+            const { pageX: mouseX, pageY: mouseY } = mouseMoveEvent;
 
-                const degrees: number = radians * (180 / Math.PI) + 90;
+            const radians: number = Math.atan2(
+                mouseY - centerY,
+                mouseX - centerX
+            );
 
-                handleRotatePanelCB(degrees);
-            }
+            const degrees: number = radians * (180 / Math.PI) + 90;
+
+            handleRotatePanelCB(degrees);
         },
         [shouldPanelRotate, boxDivRef, handleRotatePanelCB]
     );
