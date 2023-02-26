@@ -1,3 +1,13 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: clip;
+}
+
 .box {
     /* background-color: #00bcd4; */
     border: solid 3px #00bcd4;
@@ -33,61 +43,59 @@
 }
 
 .dot.left-top {
-    top: -8px;
-    left: -8px;
+    top: -6px;
+    left: -6px;
     /* cursor: nw-resize; */
 }
 
 .dot.left-bottom {
-    bottom: -8px;
-    left: -8px;
+    bottom: -6px;
+    left: -6px;
     /* cursor: sw-resize; */
 }
 
 .dot.right-top {
-    top: -8px;
-    right: -8px;
+    top: -6px;
+    right: -6px;
     /* cursor: ne-resize; */
 }
 
 .dot.right-bottom {
-    bottom: -8px;
-    right: -8px;
+    bottom: -6px;
+    right: -6px;
     /* cursor: se-resize; */
 }
 
 .dot.top-mid {
-    top: -8px;
+    top: -6px;
     left: calc(50% - 5px);
     /* cursor: n-resize; */
 }
 
 .dot.left-mid {
-    left: -8px;
+    left: -6px;
     top: calc(50% - 5px);
     /* cursor: w-resize; */
 }
 
 .dot.right-mid {
-    right: -8px;
+    right: -6px;
     top: calc(50% - 5px);
     /* cursor: e-resize; */
 }
 
 .dot.bottom-mid {
-    bottom: -8px;
+    bottom: -6px;
     left: calc(50% - 5px);
     /* cursor: s-resize; */
 }
 
-.dot.rotate {
-    top: -30px;
-    left: calc(50% - 5px);
+.rotate:hover {
     cursor: url('https://findicons.com/files/icons/1620/crystal_project/16/rotate_ccw.png'),
         auto;
 }
 
-.rotate-link {
+/* .rotate-link {
     position: absolute;
     width: 1px;
     height: 15px;
@@ -95,4 +103,4 @@
     top: -20px;
     left: calc(50% + 0.5px);
     z-index: -1;
-}
+} */
